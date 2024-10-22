@@ -108,35 +108,36 @@ export class AppProductComponent implements OnInit {
     });
   }
 
-  updateProduct(user: User) {
-    console.log(user);
+  updateProduct(product: Product) {
+    console.log(product);
 
     this.dialog.open(EditProductDialog, {
       width: '600px',
-      data: user,
+      data: product,
     });
   }
 
-  deleteProduct(userId: number) {
-    console.log(userId);
+  deleteProduct(productId: number) {
     Swal.fire({
-      title: '¿Estás seguro de eliminar este usuario?',
+      title: '¿Estás seguro de eliminar este producto?',
       text: 'Esta acción no se puede deshacer',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
       confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.productService.deleteProduct(userId).subscribe({
+        this.productService.deleteProduct(productId).subscribe({
           next: (rta) => {
             Swal.fire({
               title: '¡Hecho!',
-              text: 'El usuario ha sido eliminado.',
+              text: 'El producto ha sido eliminado.',
               icon: 'success',
             }).then(() => {
-              this.reloadUsersList();
+              this.reloadProductsList();
+              window.location.reload();
             });
           },
           error: (error) => {
@@ -144,7 +145,7 @@ export class AppProductComponent implements OnInit {
 
             Swal.fire({
               title: 'Error',
-              text: 'Ocurrió un error al eliminar el usuario.',
+              text: 'Ocurrió un error al eliminar el producto.',
               icon: 'error',
             });
 
@@ -164,7 +165,7 @@ export class AppProductComponent implements OnInit {
     });
   }
 
-  reloadUsersList() {
+  reloadProductsList() {
     this.productService.getProductsList().subscribe((productsList) => {
       this.productsList = productsList;
       console.log('Lista actualizada de productsList:', this.productsList);
@@ -201,7 +202,7 @@ export class AppProductComponent implements OnInit {
     MatIconModule,
     MatOptionModule,
     MatSelectModule,
-    CommonModule
+    CommonModule,
   ],
   providers: [provideNativeDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -229,66 +230,47 @@ export class CreateProductDialog implements OnInit {
     this.getProductsCategories();
   }
 
-  profileForm = new FormGroup({
-    firstName: new FormControl('', [Validators.required]),
-    lastName: new FormControl('', [Validators.required]),
-    documentNumber: new FormControl('', [Validators.required]),
-    userEmail: new FormControl('', [Validators.required, Validators.email]),
-    birthDate: new FormControl('', [Validators.required]),
-    userName: new FormControl('', [Validators.required]),
-    tempPwd: new FormControl('', [Validators.required]),
+  productForm = new FormGroup({
+    productName: new FormControl('', [Validators.required]),
+    categoryId: new FormControl('', [Validators.required]),
   });
 
-  submitUserCreation() {
-    if (this.profileForm.valid) {
-      let newUser: User = {
-        user_id: 0,
-        names: this.profileForm.controls['firstName'].value ?? '',
-        last_names: this.profileForm.controls['lastName'].value ?? '',
-        email: this.profileForm.controls['userEmail'].value ?? '',
-        document_number:
-          this.profileForm.controls['documentNumber'].value ?? '',
-        username: this.profileForm.controls['userName'].value ?? '',
-        password: this.profileForm.controls['tempPwd'].value ?? '',
-        born_date: this.profileForm.controls['birthDate'].value ?? '',
-        userType_id: 1,
-        userTypes: {
-          userType_id: 0,
-          userType_name: 'string',
+  submitProduct() {
+    if (this.productForm.valid) {
+      let newProduct: Product = {
+        product_id: 0,
+        product_name: this.productForm.controls['productName'].value ?? '',
+        category_id: this.productForm.controls['categoryId'].value
+          ? parseInt(this.productForm.controls['categoryId'].value)
+          : 0,
+        productCategories: {
+          category_id: 0,
+          category_name: '',
           isDeleted: false,
         },
-        document_id: 1,
-        documents: {
-          document_id: 0,
-          document_name: 'string',
-          isDeleted: false,
-        },
-        date: new Date().toISOString(),
-        modified: new Date().toISOString(),
-        modifiedBy: 'front',
         isDeleted: false,
       };
-      console.log(this.profileForm.value);
-      // this.userService.setUser(newUser).subscribe({
-      //   next: (response) => {
-      //     Swal.fire({
-      //       title: '¡Usuario Creado!',
-      //       text: 'La información del usuario ha sido guardada correctamente.',
-      //       icon: 'success',
-      //     }).then(() => {
-      //       this.dialogRef.close(true);
-      //       window.location.reload()
-      //     });
-      //   },
-      //   error: (error) => {
-      //     console.error('Error de validación:', error.error.errors);
-      //     Swal.fire({
-      //       title: 'Error',
-      //       text: 'Ocurrió un error al actualizar el usuario.',
-      //       icon: 'error',
-      //     });
-      //   },
-      // });
+      console.log(this.productForm.value);
+      this.productService.setProduct(newProduct).subscribe({
+        next: (response) => {
+          Swal.fire({
+            title: 'Producto Creado!',
+            text: 'La información del producto ha sido guardada correctamente.',
+            icon: 'success',
+          }).then(() => {
+            this.dialogRef.close(true);
+            window.location.reload();
+          });
+        },
+        error: (error) => {
+          console.error('Error de validación:', error.error.errors);
+          Swal.fire({
+            title: 'Error',
+            text: 'Ocurrió un error al actualizar el producto.',
+            icon: 'error',
+          });
+        },
+      });
     } else {
       console.error('Formulario no es válido');
     }
@@ -322,6 +304,9 @@ export class CreateProductDialog implements OnInit {
     MatInputModule,
     MatDatepickerModule,
     MatIconModule,
+    CommonModule,
+    MatOptionModule,
+    MatSelectModule,
   ],
   providers: [provideNativeDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -329,23 +314,19 @@ export class CreateProductDialog implements OnInit {
 export class EditProductDialog implements OnInit {
   hide = true;
   maxDate: Date;
-  userId: number = 0;
+  productId: number = 0;
   productsList: Product[] = [];
   productsCatgories: ProductCategory[] = [];
 
   constructor(
     public dialogRef: MatDialogRef<EditProductDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: User,
+    @Inject(MAT_DIALOG_DATA) public data: Product,
     private productService: ProductsServiceService
   ) {}
 
-  profileForm = new FormGroup({
-    firstName: new FormControl('', [Validators.required]),
-    lastName: new FormControl('', [Validators.required]),
-    documentNumber: new FormControl('', [Validators.required]),
-    userEmail: new FormControl('', [Validators.required, Validators.email]),
-    birthDate: new FormControl('', [Validators.required]),
-    userName: new FormControl('', [Validators.required]),
+  productForm = new FormGroup({
+    productName: new FormControl('', [Validators.required]),
+    categoryId: new FormControl<number | null>(null, [Validators.required]),
   });
 
   ngOnInit(): void {
@@ -355,66 +336,52 @@ export class EditProductDialog implements OnInit {
       new Date().getMonth(),
       new Date().getDate()
     );
-    this.profileForm.patchValue({
-      firstName: this.data.names,
-      lastName: this.data.last_names,
-      documentNumber: this.data.document_number,
-      birthDate: new Date(this.data.born_date).toISOString(), // Convertir la fecha si es necesario
-      userEmail: this.data.email,
-      userName: this.data.username,
+
+    this.getProductsCategories();
+
+    this.productForm.patchValue({
+      productName: this.data.product_name,
+      categoryId: this.data.category_id,
     });
   }
 
-  submitUserUpdate() {
-    if (this.profileForm.valid) {
-      this.userId = this.data.user_id;
-      // let newUser: User = {
-      //   user_id: this.data.user_id,
-      //   names: this.profileForm.controls['firstName'].value ?? '',
-      //   last_names: this.profileForm.controls['lastName'].value ?? '',
-      //   email: this.profileForm.controls['userEmail'].value ?? '',
-      //   document_number:
-      //     this.profileForm.controls['documentNumber'].value ?? '',
-      //   username: this.profileForm.controls['userName'].value ?? '',
-      //   born_date: this.profileForm.controls['birthDate'].value ?? '',
-      //   password: this.data.password,
-      //   userType_id: 1,
-      //   userTypes: {
-      //     userType_id: 0,
-      //     userType_name: 'string',
-      //     isDeleted: false,
-      //   },
-      //   document_id: 1,
-      //   documents: {
-      //     document_id: 0,
-      //     document_name: 'string',
-      //     isDeleted: false,
-      //   },
-      //   date: new Date().toISOString(),
-      //   modified: new Date().toISOString(),
-      //   modifiedBy: 'front',
-      //   isDeleted: false,
-      // };
-      // this.productService.updateProduct(newUser, this.data.user_id).subscribe({
-      //   next: (response) => {
-      //     Swal.fire({
-      //       title: '¡Usuario actualizado!',
-      //       text: 'La información del usuario ha sido actualizada correctamente.',
-      //       icon: 'success',
-      //     }).then(() => {
-      //       this.dialogRef.close(true);
-      //       window.location.reload();
-      //     });
-      //   },
-      //   error: (error) => {
-      //     console.error('Error de validación:', error.error.errors);
-      //     Swal.fire({
-      //       title: 'Error',
-      //       text: 'Ocurrió un error al actualizar el usuario.',
-      //       icon: 'error',
-      //     });
-      //   },
-      // });
+  submitProductUpdate() {
+    if (this.productForm.valid) {
+      this.productId = this.data.product_id;
+
+      let newProduct: Product = {
+        product_id: this.data.product_id,
+        product_name: this.productForm.controls['productName'].value ?? '',
+        category_id: this.productForm.controls['categoryId'].value
+          ? this.productForm.controls['categoryId'].value
+          : 0,
+        productCategories: {
+          category_id: 0,
+          category_name: '',
+          isDeleted: false,
+        },
+        isDeleted: false,
+      };
+      this.productService.updateProduct(newProduct, this.data.product_id).subscribe({
+        next: (response) => {
+          Swal.fire({
+            title: '¡Producto actualizado!',
+            text: 'La información del Producto ha sido actualizada correctamente.',
+            icon: 'success',
+          }).then(() => {
+            this.dialogRef.close(true);
+            window.location.reload();
+          });
+        },
+        error: (error) => {
+          console.error('Error de validación:', error.error.errors);
+          Swal.fire({
+            title: 'Error',
+            text: 'Ocurrió un error al actualizar el Producto.',
+            icon: 'error',
+          });
+        },
+      });
     } else {
       console.error('Formulario no es válido');
     }

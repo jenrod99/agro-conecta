@@ -112,7 +112,6 @@ export class AppTablesComponent implements OnInit {
   }
 
   deleteUser(userId: number) {
-    console.log(userId);
     Swal.fire({
       title: '¿Estás seguro de eliminar este usuario?',
       text: 'Esta acción no se puede deshacer',
@@ -121,6 +120,7 @@ export class AppTablesComponent implements OnInit {
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
       confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
     }).then((result) => {
       if (result.isConfirmed) {
         this.userService.deleteUser(userId).subscribe({
@@ -131,6 +131,7 @@ export class AppTablesComponent implements OnInit {
               icon: 'success',
             }).then(() => {
               this.reloadUsersList();
+              window.location.reload();
             });
           },
           error: (error) => {
