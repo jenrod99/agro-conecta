@@ -1,0 +1,34 @@
+<h2 mat-dialog-title>Crear Productos</h2>
+<mat-dialog-content>
+    <p>
+        Complete la siguiente información para crear productos.
+    </p>
+    <form class="example-form" [formGroup]="profileForm" (ngSubmit)="submitUserCreation()">
+        <div class="row">
+            <div class="col-lg-6 m-b-8">
+                <mat-form-field appearance="outline" class="w-100" color="primary">
+                    <mat-label>Nombre</mat-label>
+                    <input type="text" matInput formControlName="firstName"> @if (profileForm.get('firstName')?.hasError('required')) {
+                    <mat-error>El nombre es <strong>obligatorio.</strong></mat-error>
+                    }
+                </mat-form-field>
+            </div>
+            <div class="col-lg-6 m-b-8">
+                <mat-form-field appearance="outline">
+                    <mat-label>Selecciona una categoría</mat-label>
+                    <mat-select>
+                        <mat-option *ngFor="let category of productsCatgories" [value]="category.category_id">
+                            {{ category.category_name }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+    </form>
+
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-stroked-button type=" submit " color="primary " class="m-r-8 " (click)="submitUserCreation()">Crear
+        Usuario</button>
+    <button mat-stroked-button color="warn " mat-dialog-close>Cancelar</button>
+</mat-dialog-actions>

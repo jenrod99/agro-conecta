@@ -1,0 +1,93 @@
+<mat-card class="cardWithShadow">
+    <mat-card-header>
+        <mat-card-title-group class="m-b-10">
+            <mat-card-title>Listado de Productos</mat-card-title>
+            <button mat-flat-button (click)="openDialog()" color="primary">Crear Producto</button>
+        </mat-card-title-group>
+    </mat-card-header>
+    <mat-card-content>
+        <div class="table-responsive">
+            <table mat-table [dataSource]="productsList" class="w-100">
+                <!-- Position Column -->
+                <ng-container matColumnDef="id">
+                    <th mat-header-cell *matHeaderCellDef class="f-w-600 mat-subtitle-1 f-s-14 p-l-0">
+                        ID
+                    </th>
+                    <td mat-cell *matCellDef="let product" class="p-l-0">
+                        <div class="d-flex align-items-center">
+                            <p class="f-s-14">
+                                {{ product.product_id }}
+                            </p>
+                        </div>
+                    </td>
+                </ng-container>
+
+
+                <!-- Número de Documento Column -->
+                <ng-container matColumnDef="product_name">
+                    <th mat-header-cell *matHeaderCellDef class="f-w-600 mat-subtitle-1 f-s-14 p-l-0">
+                        Nombre
+                    </th>
+                    <td mat-cell *matCellDef="let product" class="p-l-0">
+                        <div class="d-flex align-items-center">
+                            <p class="f-s-14">
+                                {{ product.product_name }}
+                            </p>
+                        </div>
+                    </td>
+                </ng-container>
+
+                <!-- productname Column -->
+                <ng-container matColumnDef="category_id">
+                    <th mat-header-cell *matHeaderCellDef class="f-w-600 mat-subtitle-1 f-s-14 p-l-0">
+                        ID Categoría
+                    </th>
+                    <td mat-cell *matCellDef="let product" class="p-l-0">
+                        <div class="d-flex align-items-center">
+                            <p class="f-s-14">
+                                {{ product.category_id }}
+                            </p>
+                        </div>
+                    </td>
+                </ng-container>
+
+                <!-- productname Column -->
+                <ng-container matColumnDef="category_name">
+                    <th mat-header-cell *matHeaderCellDef class="f-w-600 mat-subtitle-1 f-s-14 p-l-0">
+                        Nombre Categoría
+                    </th>
+                    <td mat-cell *matCellDef="let product" class="p-l-0">
+                        <div class="d-flex align-items-center">
+                            <p class="f-s-14">
+                                {{ product.productCategories.category_name }}
+                            </p>
+                        </div>
+                    </td>
+                </ng-container>
+
+                <!-- Symbol Column -->
+                <ng-container matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef class="f-w-600 mat-subtitle-1 f-s-14"></th>
+                    <td mat-cell *matCellDef="let element" class="mat-body-1">
+                        <button mat-icon-button [matMenuTriggerFor]="productMenu">
+                            <mat-icon>more_vert</mat-icon>
+                        </button>
+                        <mat-menu #productMenu="matMenu">
+                            <button mat-menu-item (click)="updateProduct(element)">
+                                <mat-icon>edit</mat-icon>
+                                <span>Edit</span>
+                            </button>
+                            <button mat-menu-item (click)="deleteProduct(element.product_id)">
+                                <mat-icon>delete</mat-icon>
+                                <span>Delete</span>
+                            </button>
+                        </mat-menu>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedProductColumns"></tr>
+                <tr mat-row *matRowDef="let productRow; columns: displayedProductColumns"></tr>
+            </table>
+        </div>
+    </mat-card-content>
+</mat-card>

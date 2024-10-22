@@ -1,0 +1,135 @@
+<mat-card class="cardWithShadow">
+    <mat-card-header>
+        <mat-card-title-group class="m-b-10">
+            <mat-card-title>Usuarios</mat-card-title>
+            <button mat-flat-button (click)="openDialog()" color="primary">Crear Usuarios</button>
+        </mat-card-title-group>
+    </mat-card-header>
+    <mat-card-content>
+        <div class="table-responsive">
+            <table mat-table [dataSource]="usersList" class="w-100">
+                <!-- Position Column -->
+                <ng-container matColumnDef="id">
+                    <th mat-header-cell *matHeaderCellDef class="f-w-600 mat-subtitle-1 f-s-14 p-l-0">
+                        ID
+                    </th>
+                    <td mat-cell *matCellDef="let user" class="p-l-0">
+                        <div class="d-flex align-items-center">
+                            <p class="f-s-14">
+                                {{ user.user_id }}
+                            </p>
+                        </div>
+                    </td>
+                </ng-container>
+
+
+                <!-- Número de Documento Column -->
+                <ng-container matColumnDef="document_number">
+                    <th mat-header-cell *matHeaderCellDef class="f-w-600 mat-subtitle-1 f-s-14 p-l-0">
+                        Número de Documento
+                    </th>
+                    <td mat-cell *matCellDef="let user" class="p-l-0">
+                        <div class="d-flex align-items-center">
+                            <p class="f-s-14">
+                                {{ user.document_number }}
+                            </p>
+                        </div>
+                    </td>
+                </ng-container>
+
+                <!-- Username Column -->
+                <ng-container matColumnDef="names">
+                    <th mat-header-cell *matHeaderCellDef class="f-w-600 mat-subtitle-1 f-s-14 p-l-0">
+                        Nombre
+                    </th>
+                    <td mat-cell *matCellDef="let user" class="p-l-0">
+                        <div class="d-flex align-items-center">
+                            <p class="f-s-14">
+                                {{ user.names }}
+                            </p>
+                        </div>
+                    </td>
+                </ng-container>
+
+                <!-- LastName Column -->
+                <ng-container matColumnDef="last_names">
+                    <th mat-header-cell *matHeaderCellDef class="f-w-600 mat-subtitle-1 f-s-14 p-l-0">
+                        Apellido
+                    </th>
+                    <td mat-cell *matCellDef="let user" class="p-l-0">
+                        <div class="d-flex align-items-center">
+                            <p class="f-s-14">
+                                {{ user.last_names }}
+                            </p>
+                        </div>
+                    </td>
+                </ng-container>
+
+                <!-- BornDate Column -->
+                <ng-container matColumnDef="bornDate">
+                    <th mat-header-cell *matHeaderCellDef class="f-w-600 mat-subtitle-1 f-s-14 p-l-0">
+                        Fecha de Nacimiento
+                    </th>
+                    <td mat-cell *matCellDef="let user" class="p-l-0">
+                        <div class="d-flex align-items-center">
+                            <p class="f-s-14">
+                                {{ user.born_date| date: 'dd/MM/yyyy' }}
+                            </p>
+                        </div>
+                    </td>
+                </ng-container>
+
+                <!-- Email Column -->
+                <ng-container matColumnDef="email">
+                    <th mat-header-cell *matHeaderCellDef class="f-w-600 mat-subtitle-1 f-s-14 p-l-0">
+                        Correo Electrónico
+                    </th>
+                    <td mat-cell *matCellDef="let user" class="p-l-0">
+                        <div class="d-flex align-items-center">
+                            <p class="f-s-14">
+                                {{ user.email }}
+                            </p>
+                        </div>
+                    </td>
+                </ng-container>
+
+                <!-- UserName Column -->
+                <ng-container matColumnDef="username">
+                    <th mat-header-cell *matHeaderCellDef class="f-w-600 mat-subtitle-1 f-s-14 p-l-0">
+                        Usuario de acceso
+                    </th>
+                    <td mat-cell *matCellDef="let user" class="p-l-0">
+                        <div class="d-flex align-items-center">
+                            <p class="f-s-14">
+                                {{ user.username }}
+                            </p>
+                        </div>
+                    </td>
+                </ng-container>
+
+                <!-- Symbol Column -->
+                <ng-container matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef class="f-w-600 mat-subtitle-1 f-s-14"></th>
+                    <td mat-cell *matCellDef="let element" class="mat-body-1">
+                        <button mat-icon-button [matMenuTriggerFor]="userMenu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+                        <mat-menu #userMenu="matMenu">
+                            <button mat-menu-item (click)="updateUser(element)">
+                <mat-icon>edit</mat-icon>
+                <span>Edit</span>
+              </button>
+                            <button mat-menu-item (click)="deleteUser(element.user_id)">
+                <mat-icon>delete</mat-icon>
+                <span>Delete</span>
+              </button>
+                        </mat-menu>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedUserColumns"></tr>
+                <tr mat-row *matRowDef="let userRow; columns: displayedUserColumns"></tr>
+            </table>
+        </div>
+    </mat-card-content>
+</mat-card>
